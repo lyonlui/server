@@ -1,0 +1,135 @@
+CREATE DATABASE TreasureDB;
+USE TreasureDB;
+
+
+CREATE TABLE ConfineAddress(
+	AddrString NVARCHAR(15) NOT NULL,
+	EnjoinLogin BIT NOT NULL,
+	EnjoinRegister BIT NOT NULL,
+	EnjoinOverDate DATETIME,
+	CollectDate DATETIME NOT NULL,
+	CollectNote NVARCHAR(32) NOT NULL,
+	PRIMARY KEY (AddrString)
+);
+CREATE TABLE ConfineMachine(
+	MachineSerial NVARCHAR(32) NOT NULL,
+	EnjoinLogin BIT NOT NULL,
+	EnjoinRegister BIT NOT NULL,
+	EnjoinOverDate DATETIME,
+	CollectDate DATETIME NOT NULL,
+	CollectNote NVARCHAR(32) NOT NULL,
+	PRIMARY KEY (MachineSerial)
+);
+CREATE TABLE GameScoreInfo(
+	UserID INT NOT NULL,
+	Score BIGINT NOT NULL,
+	Revenue BIGINT NOT NULL,
+	InsureScore BIGINT NOT NULL,
+	WinCount INT NOT NULL,
+	LostCount INT NOT NULL,
+	DrawCount INT NOT NULL,
+	FleeCount INT NOT NULL,
+	AllLoginTimes INT NOT NULL,
+	PlayTimeCount INT NOT NULL,
+	OnLineTimeCount INT NOT NULL,
+	LastLoginIP NVARCHAR(15) NOT NULL,
+	LastLoginDate DATETIME NOT NULL,
+	LastLoginMachine NVARCHAR(32) NOT NULL,
+	RegisterIP NVARCHAR(15) NOT NULL,
+	RegisterDate DATETIME NOT NULL,
+	RegisterMachine NVARCHAR(32) NOT NULL,
+	PRIMARY KEY (UserID)
+
+);
+
+CREATE TABLE GameScoreLocker(
+	UserID INT NOT NULL,
+	KindID INT NOT NULL,
+	ServerID INT NOT NULL,
+	EnterIP NVARCHAR(15) NOT NULL,
+	EnterMachine NVARCHAR(32) NOT NULL,
+	CollectDate DATETIME NOT NULL,
+	PRIMARY KEY (UserID)
+
+);
+
+CREATE TABLE GlobalShareInfo(
+	ShareID INT NOT NULL,
+	ShareName NVARCHAR(32) NOT NULL,
+	ShareAlias NVARCHAR(32) NOT NULL,
+	ShareNote NVARCHAR(32) NOT NULL,
+	CollectDate DATETIME NOT NULL,
+	PRIMARY KEY (ShareID)
+);
+
+CREATE TABLE GlobalSpreadInfo(
+	ID INT AUTO_INCREMENT NOT NULL,
+	RegisterGrantScore INT NOT NULL,
+	PlayTimeCount INT NOT NULL,
+	PlayTimeGrantScore INT NOT NULL,
+	FillGrantRate DECIMAL NOT NULL,
+	BalanceRate DECIMAL NOT NULL,
+	MinBalanceScore INT NOT NULL,
+	PRIMARY KEY (ID)
+
+);
+
+CREATE TABLE RecordSpreadInfo(
+	RecordID INT NOT NULL,
+	UserID INT NOT NULL,
+	Score BIGINT NOT NULL,
+	TypeID INT NOT NULL,
+	ChildrenID INT NOT NULL,
+	InsureScore BIGINT NOT NULL,
+	CollectDate DATETIME NOT NULL,
+	CollectNote NVARCHAR(128) NOT NULL,
+	PRIMARY KEY (RecordID)
+);
+
+CREATE TABLE ShareDetialInfo(
+	DetialID INT NOT NULL,
+	OpenUserID INT NOT NULL,
+	ShareID INT NOT NULL,
+	UserID INT NOT NULL,
+	Accounts NVARCHAR(16) NOT NULL,
+	SerialID NVARCHAR(15) NOT NULL,
+	OrderID NVARCHAR(32) NOT NULL,
+	CardTypeID INT NOT NULL,
+	CardPrice DECIMAL NOT NULL,
+	CardGold BIGINT NOT NULL,
+	BeforeGold BIGINT NOT NULL, 
+	CardTotal INT NOT NULL,
+	OrderAmount DECIMAL NOT NULL,
+	DiscountScale DECIMAL NOT NULL,
+	PayAmount DECIMAL NOT NULL, 
+	IPAddress NVARCHAR(15) NOT NULL,
+	ApplyDate DATETIME NOT NULL,
+	PRIMARY KEY (DetialID)
+	
+
+);
+
+CREATE TABLE StreamShareInfo(
+	DateID INT NOT NULL,
+	ShareID INT NOT NULL,
+	ShareTotals INT NOT NULL,
+	CollectDate DATETIME NOT NULL,
+	PRIMARY KEY (DateID)
+	
+
+);
+
+CREATE TABLE SystemStreamInfo(
+	DateID INT NOT NULL,
+	KindID INT NOT NULL,
+	ServerID INT NOT NULL,
+	LoginCount INT NOT NULL,
+	RegisterCount INT NOT NULL,
+	CollectDate DATETIME NOT NULL,
+	PRIMARY KEY (DateID)
+	
+
+);
+
+
+
