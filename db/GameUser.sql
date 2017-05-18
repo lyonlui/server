@@ -22,7 +22,7 @@ CREATE TABLE AccountsInfo(
 	LoginPass NCHAR(32) NOT NULL COMMENT '登录密码',
 	FaceID SMALLINT NOT NULL DEFAULT 0  COMMENT '头像标识',
 	CustomID INT NOT NULL DEFAULT 0  COMMENT '自定标识',
-	IsOnline BIT NOT NULL DEFAULT 0  COMMENT '在线标识',
+	IsOnline TINYINT NOT NULL DEFAULT 0  COMMENT '在线标识',
 	CustomFaceVer TINYINT NOT NULL DEFAULT 0  COMMENT '头像版本',
 	Gender TINYINT NOT NULL DEFAULT 0  COMMENT '用户性别',
 	Nullity TINYINT NOT NULL DEFAULT 0  COMMENT '禁止服务',
@@ -35,7 +35,7 @@ CREATE TABLE AccountsInfo(
 	OnLineTimeCount INT NOT NULL DEFAULT 0  COMMENT '在线时间',
 	LastLoginIP NVARCHAR(15) NOT NULL  COMMENT '登录地址',
 	LastLoginDate DATETIME NOT NULL DEFAULT NOW() COMMENT '登录时间',
-	LastLoginMacine NVARCHAR(32) NOT NULL DEFAULT "-----------"  COMMENT '登录机器',
+	LastLoginMachine NVARCHAR(32) NOT NULL DEFAULT "-----------"  COMMENT '登录机器',
 	RegisterIP NVARCHAR(15) NOT NULL COMMENT '注册地址',
 	RegisterDate DATETIME NOT NULL DEFAULT NOW()  COMMENT '注册时间',
 	RegisterMachine NVARCHAR(32) NOT NULL DEFAULT "-----------"  COMMENT '注册机器',
@@ -44,8 +44,8 @@ CREATE TABLE AccountsInfo(
 
 CREATE TABLE ConfineAddress(
 	AddrString NVARCHAR(15) NOT NULL  COMMENT '地址字符',
-	EnjoinLogin BIT NOT NULL DEFAULT 0  COMMENT '限制登录',
-	EnjoinRegister BIT NOT NULL DEFAULT 0  COMMENT '限制注册',
+	EnjoinLogin TINYINT NOT NULL DEFAULT 0  COMMENT '限制登录',
+	EnjoinRegister TINYINT NOT NULL DEFAULT 0  COMMENT '限制注册',
 	EnjoinOverDate DATETIME  COMMENT '过期时间',
 	CollectDate DATETIME NOT NULL DEFAULT NOW()  COMMENT '收集时间',
 	CollectNote NVARCHAR(32) NOT NULL DEFAULT ""  COMMENT '输入备注',
@@ -53,8 +53,8 @@ CREATE TABLE ConfineAddress(
 );
 CREATE TABLE ConfineMachine(
 	MachineSerial NVARCHAR(32) NOT NULL COMMENT '机器序列',
-	EnjoinLogin BIT NOT NULL  ,
-	EnjoinRegister BIT NOT NULL DEFAULT 0  COMMENT '限制注册',
+	EnjoinLogin TINYINT NOT NULL  ,
+	EnjoinRegister TINYINT NOT NULL DEFAULT 0  COMMENT '限制注册',
 	EnjoinOverDate DATETIME COMMENT '过期时间',
 	CollectDate DATETIME NOT NULL DEFAULT NOW()  COMMENT '收集时间',
 	CollectNote NVARCHAR(32) NOT NULL DEFAULT ""  COMMENT '输入备注',
@@ -106,7 +106,7 @@ CREATE TABLE SystemStreamInfo(
 	WebLoginSuccess INT NOT NULL DEFAULT 0 COMMENT '登录成功',
 	WebRegisterSuccess INT NOT NULL DEFAULT 0 COMMENT '注册成功',
 	GameLoginSuccess INT NOT NULL DEFAULT 0 COMMENT '登录成功',
-	GameRegisterSuccess DATETIME NOT NULL DEFAULT 0 COMMENT '注册成功',
+	GameRegisterSuccess int NOT NULL DEFAULT 0 COMMENT '注册成功',
 	CollectDate DATETIME NOT NULL DEFAULT NOW() COMMENT '登录时间',
 	PRIMARY KEY (DateID)
 );

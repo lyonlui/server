@@ -45,7 +45,7 @@ import (
 	"fmt"
 	"sync"
 	"time"
-	// import mysql driver
+
 	_ "github.com/go-sql-driver/mysql"
 )
 

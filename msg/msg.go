@@ -17,7 +17,7 @@ type Login struct {
 	Accounts      string
 	Password      string
 	ClientSerial  string
-	Device        int
+	Device        string
 	ClientVersion string
 }
 
@@ -25,8 +25,9 @@ type AchieveSession struct {
 }
 
 type LoginFeedback struct {
-	LoginStatus bool
-	ErrorCode   int
+	LoginStatus   bool
+	ErrorDescribe string
+	AccountInfo   interface{}
 }
 
 type Session struct {
