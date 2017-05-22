@@ -20,7 +20,7 @@ var db *sql.DB
 type AccountInfo struct {
 	UserID        int
 	Accounts      string
-	Nickname      string
+	NickName      string
 	UnderWrite    string
 	FaceID        int
 	Gender        int
@@ -53,6 +53,8 @@ func handleLogin(args []interface{}) {
 	//消息字段过滤，防注入
 
 	loginStatus, strErrorDescribe, accInfo := loginVerify(userMag.Accounts, userMag.Password, strings.Split(userAgent.RemoteAddr().String(), ":")[0], userMag.ClientSerial)
+
+	fmt.Println(strErrorDescribe)
 
 	// 给发送者回应一个 Hello 消息
 	userAgent.WriteMsg(&msg.LoginFeedback{
@@ -89,8 +91,6 @@ func loginVerify(strAccounts string, strPassword string, strClientIP string, mac
 		if StatusValue != 0 {
 			row := db.QueryRow("SELECT StatusDescription FROM SystemStatusInfo WHERE StatusName = ?", "EnjoinLogon")
 			err := row.Scan(&strErrorDescribe)
-			fmt.Println(err)
-			fmt.Println(strErrorDescribe)
 			return false, strErrorDescribe, info
 		}
 	}
@@ -111,7 +111,10 @@ func loginVerify(strAccounts string, strPassword string, strClientIP string, mac
 	//查询用户
 	var UserID, Nullity, StunDown, FaceID, Gender, CustomFaceVer, PlayTimeCount int
 	var NickName, UnderWrite, LoginPass, Accounts string
-	row = db.QueryRow("SELECT UserID,Accounts,NickName,UnderWrite,LoginPass,FaceID,Gender,Nullity,StunDown,CustomFaceVer,PlayTimeCount FROM AccountsInfo WHERE Accounts = ?", strAccounts)
+
+	stmt, _ := db.Prepare(`SELECT UserID,Accounts,NickName,UnderWrite,LoginPass,FaceID,Gender,Nullity,StunDown,CustomFaceVer,PlayTimeCount FROM AccountsInfo WHERE Accounts = ?`)
+	row = stmt.QueryRow(strAccounts)
+	defer stmt.Close()
 	err = row.Scan(&UserID, &Accounts, &NickName, &UnderWrite, &LoginPass, &FaceID, &Gender, &Nullity, &StunDown, &CustomFaceVer, &PlayTimeCount)
 
 	if err == sql.ErrNoRows {
@@ -136,8 +139,8 @@ func loginVerify(strAccounts string, strPassword string, strClientIP string, mac
 	}
 
 	//更新信息
-	db.Exec("UPDATE AccountsInfo SET GameLoginTimes = GameLoginTimes+1 , `LastLoginDate`=NOW() , `LastLoginIP` = ? ,`LastLoginMachine` = ? WHERE UserID=?", strClientIP, machineSerial, UserID)
-
+	stmt, _ = db.Prepare(`UPDATE AccountsInfo SET GameLoginTimes = GameLoginTimes+1 , LastLoginDate =NOW() , LastLoginIP = ? ,LastLoginMachine = ? WHERE UserID=?`)
+	stmt.Exec(strClientIP, machineSerial, UserID)
 	fmt.Println("here")
 
 	//记录日志
@@ -149,7 +152,7 @@ func loginVerify(strAccounts string, strPassword string, strClientIP string, mac
 	//输出变量
 	strErrorDescribe = "登录成功"
 	info.Accounts = Accounts
-	info.Nickname = NickName
+	info.NickName = NickName
 	info.CustomFaceVer = CustomFaceVer
 	info.FaceID = FaceID
 	info.Gender = Gender
