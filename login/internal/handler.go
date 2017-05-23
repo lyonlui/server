@@ -34,7 +34,7 @@ func handleMsg(m interface{}, h interface{}) {
 func init() {
 
 	handleMsg(&msg.Login{}, handleLogin)
-	handleMsg(&msg.Session{}, handleSession)
+	handleMsg(&msg.Quit{}, handleQuit)
 
 }
 
@@ -51,17 +51,43 @@ func handleLogin(args []interface{}) {
 	log.Debug("hello %v", userMag.Accounts)
 
 	//消息字段过滤，防注入
-
 	loginStatus, strErrorDescribe, accInfo := loginVerify(userMag.Accounts, userMag.Password, strings.Split(userAgent.RemoteAddr().String(), ":")[0], userMag.ClientSerial)
 
 	fmt.Println(strErrorDescribe)
+
+	//设置用户session
+
+	if loginStatus {
+		userData := userAgent.UserData()
+		userData.UserID = accInfo.UserID
+		userData.Verify = true
+		userAgent.SetUserData(userData)
+	}
 
 	// 给发送者回应一个 Hello 消息
 	userAgent.WriteMsg(&msg.LoginFeedback{
 		LoginStatus:   loginStatus,
 		ErrorDescribe: strErrorDescribe,
-		AccountInfo:   accInfo,
+		NickName:      accInfo.NickName,
+		UnderWrite:    accInfo.UnderWrite,
+		FaceID:        accInfo.FaceID,
+		Gender:        accInfo.Gender,
+		CustomFaceVer: accInfo.CustomFaceVer,
 	})
+
+}
+
+// 收到的 Quit 消息
+func handleQuit(args []interface{}) {
+
+	// 消息的发送者
+	userAgent := args[1].(gate.Agent)
+
+	userAgent.WriteMsg(&msg.QuitFeedback{
+		QuitStatus: false,
+	})
+
+	userAgent.Close()
 
 }
 
@@ -91,6 +117,9 @@ func loginVerify(strAccounts string, strPassword string, strClientIP string, mac
 		if StatusValue != 0 {
 			row := db.QueryRow("SELECT StatusDescription FROM SystemStatusInfo WHERE StatusName = ?", "EnjoinLogon")
 			err := row.Scan(&strErrorDescribe)
+			if err == sql.ErrNoRows {
+				strErrorDescribe = "系统维护中"
+			}
 			return false, strErrorDescribe, info
 		}
 	}
@@ -109,13 +138,13 @@ func loginVerify(strAccounts string, strPassword string, strClientIP string, mac
 	}
 
 	//查询用户
-	var UserID, Nullity, StunDown, FaceID, Gender, CustomFaceVer, PlayTimeCount int
-	var NickName, UnderWrite, LoginPass, Accounts string
+	var UserID, Nullity, StunDown, FaceID, Gender, CustomFaceVer, PlayTimeCount, MoorMachine int
+	var NickName, UnderWrite, LoginPass, Accounts, MachineSerial string
 
-	stmt, _ := db.Prepare(`SELECT UserID,Accounts,NickName,UnderWrite,LoginPass,FaceID,Gender,Nullity,StunDown,CustomFaceVer,PlayTimeCount FROM AccountsInfo WHERE Accounts = ?`)
+	stmt, _ := db.Prepare(`SELECT UserID,Accounts,NickName,UnderWrite,LoginPass,FaceID,Gender,Nullity,StunDown,CustomFaceVer,PlayTimeCount,MoorMachine,MachineSerial FROM AccountsInfo WHERE Accounts = ?`)
 	row = stmt.QueryRow(strAccounts)
 	defer stmt.Close()
-	err = row.Scan(&UserID, &Accounts, &NickName, &UnderWrite, &LoginPass, &FaceID, &Gender, &Nullity, &StunDown, &CustomFaceVer, &PlayTimeCount)
+	err = row.Scan(&UserID, &Accounts, &NickName, &UnderWrite, &LoginPass, &FaceID, &Gender, &Nullity, &StunDown, &CustomFaceVer, &PlayTimeCount, &MoorMachine, &MachineSerial)
 
 	if err == sql.ErrNoRows {
 
@@ -133,9 +162,23 @@ func loginVerify(strAccounts string, strPassword string, strClientIP string, mac
 		return false, strErrorDescribe, info
 	}
 
+	if MoorMachine == 1 {
+		if MachineSerial != machineSerial {
+			strErrorDescribe = "您的帐号使用固定机器登陆功能，您现所使用的机器不是所指定的机器！"
+			return false, strErrorDescribe, info
+		}
+	}
+
 	if LoginPass != strPassword {
 		strErrorDescribe = "您的帐号不存在或者密码输入有误，请查证后再次尝试登录！"
 		return false, strErrorDescribe, info
+	} else {
+		strErrorDescribe = "登录成功"
+	}
+
+	if MoorMachine == 2 {
+		db.Exec("UPDATE AccountsInfo SET MoorMachine = 1 ,MachineSerial = ? WHERE = UserID=?", machineSerial, UserID)
+		strErrorDescribe = "您的帐号成功使用了固定机器登陆功能！"
 	}
 
 	//更新信息
@@ -150,7 +193,7 @@ func loginVerify(strAccounts string, strPassword string, strClientIP string, mac
 	fmt.Println(strAccounts, strPassword, strClientIP)
 
 	//输出变量
-	strErrorDescribe = "登录成功"
+
 	info.Accounts = Accounts
 	info.NickName = NickName
 	info.CustomFaceVer = CustomFaceVer
@@ -160,8 +203,4 @@ func loginVerify(strAccounts string, strPassword string, strClientIP string, mac
 	info.UserID = UserID
 
 	return true, strErrorDescribe, info
-}
-
-func handleSession(args []interface{}) {
-
 }

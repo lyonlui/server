@@ -8,9 +8,10 @@ var Processor = json.NewProcessor()
 
 func init() {
 	Processor.Register(&Login{})
-	Processor.Register(&AchieveSession{})
 	Processor.Register(&LoginFeedback{})
-	Processor.Register(&Session{})
+	Processor.Register(&Quit{})
+	Processor.Register(&QuitFeedback{})
+
 }
 
 type Login struct {
@@ -21,16 +22,19 @@ type Login struct {
 	ClientVersion string
 }
 
-type AchieveSession struct {
-}
-
 type LoginFeedback struct {
 	LoginStatus   bool
 	ErrorDescribe string
-	AccountInfo   interface{}
+	NickName      string
+	UnderWrite    string
+	FaceID        int
+	Gender        int
+	CustomFaceVer int
 }
 
-type Session struct {
-	Status    bool
-	SessionID string
+type Quit struct {
+}
+
+type QuitFeedback struct {
+	QuitStatus bool
 }

@@ -36,6 +36,7 @@ CREATE TABLE AccountsInfo(
 	LastLoginIP NVARCHAR(15) NOT NULL  COMMENT '登录地址',
 	LastLoginDate DATETIME NOT NULL DEFAULT NOW() COMMENT '登录时间',
 	LastLoginMachine NVARCHAR(32) NOT NULL DEFAULT "-----------"  COMMENT '登录机器',
+	MachineSerial NVARCHAR(32) NOT NULL DEFAULT "-----------"  COMMENT '登录机器',
 	RegisterIP NVARCHAR(15) NOT NULL COMMENT '注册地址',
 	RegisterDate DATETIME NOT NULL DEFAULT NOW()  COMMENT '注册时间',
 	RegisterMachine NVARCHAR(32) NOT NULL DEFAULT "-----------"  COMMENT '注册机器',
