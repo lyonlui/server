@@ -11,6 +11,7 @@ func init() {
 	Processor.Register(&LoginFeedback{})
 	Processor.Register(&Quit{})
 	Processor.Register(&QuitFeedback{})
+	Processor.Register(&Warnning{})
 
 }
 
@@ -37,4 +38,6 @@ type Quit struct {
 
 type QuitFeedback struct {
 	QuitStatus bool
+}
+type Warnning struct {
 }

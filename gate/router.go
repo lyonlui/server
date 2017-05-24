@@ -11,5 +11,6 @@ func init() {
 	msg.Processor.SetRouter(&msg.LoginFeedback{}, login.ChanRPC)
 	msg.Processor.SetRouter(&msg.Quit{}, login.ChanRPC)
 	msg.Processor.SetRouter(&msg.QuitFeedback{}, login.ChanRPC)
+	msg.Processor.SetRouter(&msg.Warnning{}, login.ChanRPC)
 
 }

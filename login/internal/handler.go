@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"reflect"
 	"server/msg"
+	"server/users"
 	"strings"
 
 	"database/sql"
@@ -62,9 +63,25 @@ func handleLogin(args []interface{}) {
 		userData.UserID = accInfo.UserID
 		userData.Verify = true
 		userAgent.SetUserData(userData)
+		//判断用户是否已在线
+		if users.AgentExit(userData.UserID) { //在线
+			//将已在线用户踢下线
+			agentLogined := *users.GetAgent(userData.UserID)
+			agentLogined.WriteMsg(&msg.Warnning{ //发送警告消息
+			/////////////////////
+			////////////////////
+
+			})
+			agentLogined.Close()
+			//添加新用户
+			users.AddAgent(userData.UserID, &userAgent)
+
+		} else { //不在线
+			users.AddAgent(userData.UserID, &userAgent) //将验证后的用户添加进入用户表
+		}
 	}
 
-	// 给发送者回应一个 Hello 消息
+	// 给发送者回应一个 登录成功的 消息
 	userAgent.WriteMsg(&msg.LoginFeedback{
 		LoginStatus:   loginStatus,
 		ErrorDescribe: strErrorDescribe,
@@ -184,12 +201,10 @@ func loginVerify(strAccounts string, strPassword string, strClientIP string, mac
 	//更新信息
 	stmt, _ = db.Prepare(`UPDATE AccountsInfo SET GameLoginTimes = GameLoginTimes+1 , LastLoginDate =NOW() , LastLoginIP = ? ,LastLoginMachine = ? WHERE UserID=?`)
 	stmt.Exec(strClientIP, machineSerial, UserID)
-	fmt.Println("here")
 
 	//记录日志
 	db.Exec("INSERT INTO SystemStreamInfo (DateID, GameLoginSuccess) VALUES (unix_timestamp(curdate()),1)  ON DUPLICATE KEY UPDATE GameLoginSuccess=GameLoginSuccess+1")
 
-	fmt.Println("here")
 	fmt.Println(strAccounts, strPassword, strClientIP)
 
 	//输出变量
