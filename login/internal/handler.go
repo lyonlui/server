@@ -66,12 +66,12 @@ func handleLogin(args []interface{}) {
 		//判断用户是否已在线
 		if users.AgentExit(userData.UserID) { //在线
 			//将已在线用户踢下线
+			warnDescribe := "检测到你的账户在异地登录，若不是本人操作，请尽快修改密码"
 			agentLogined := *users.GetAgent(userData.UserID)
 			agentLogined.WriteMsg(&msg.Warnning{ //发送警告消息
-			/////////////////////
-			////////////////////
-
+				WarnDescribe: warnDescribe,
 			})
+			strErrorDescribe = "检测到你的账户重复登录，若不是本人操作，请尽快修改用户密码！"
 			agentLogined.Close()
 			//添加新用户
 			users.AddAgent(userData.UserID, &userAgent)
